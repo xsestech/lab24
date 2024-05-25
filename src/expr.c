@@ -129,14 +129,14 @@ bool shunting_yard(list_handle_t infinx_expr, list_handle_t postfix_expr) {
             operator_priority(token.data.operator)) || (operator_priority(top_token.data.operator) ==
             operator_priority(token.data.operator) && is_operator_left_associative(token.data.operator)))) {
             token_t op = list_remove(list_end(stack));
-            list_push_front(postfix_expr, op);
+            list_push_back(postfix_expr, op);
           }
         }
         list_push_back(stack, token);
         break;
       case TOKEN_CONST:
       case TOKEN_VARIABLE:
-        list_push_front(postfix_expr, token);
+        list_push_back(postfix_expr, token);
         break;
       case TOKEN_LEFT_BRACKET:
         list_push_back(stack, token);
@@ -147,7 +147,7 @@ bool shunting_yard(list_handle_t infinx_expr, list_handle_t postfix_expr) {
           if (list_is_empty(stack)) {
             return false;
           }
-          list_push_front(postfix_expr, top_token);
+          list_push_back(postfix_expr, top_token);
           list_remove(list_end(stack));
           top_token = list_iter_val(list_end(stack));
         }
@@ -165,7 +165,7 @@ bool shunting_yard(list_handle_t infinx_expr, list_handle_t postfix_expr) {
     if (list_iter_val(list_end(stack)).type == TOKEN_LEFT_BRACKET) {
       return false;
     }
-    list_push_front(postfix_expr, list_remove(list_end(stack)));
+    list_push_back(postfix_expr, list_remove(list_end(stack)));
   }
   list_destroy(stack);
 
