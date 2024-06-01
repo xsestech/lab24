@@ -125,7 +125,7 @@ bool shunting_yard(list_handle_t infinx_expr, list_handle_t postfix_expr) {
       case TOKEN_OPERATOR:
         if (!list_is_empty(stack)) {
           top_token = list_iter_val(list_end(stack));
-          while ((top_token.type == TOKEN_OPERATOR) && ((operator_priority(top_token.data.operator) >
+          while ((!list_is_empty(stack)) && (top_token.type == TOKEN_OPERATOR) && ((operator_priority(top_token.data.operator) >
             operator_priority(token.data.operator)) || (operator_priority(top_token.data.operator) ==
             operator_priority(token.data.operator) && is_operator_left_associative(token.data.operator)))) {
             token_t op = list_remove(list_end(stack));

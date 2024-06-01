@@ -18,10 +18,18 @@ typedef tree_node_t* tree_t;
 #define STACK_TYPE tree_t
 #include "stack.h"
 
+typedef enum {
+ PARENT_LEFT,
+ PARENT_RIGHT,
+ PARENT_NONE,
+} tree_parent_type_t;
+
 struct tree_node_t {
   token_t value;
   tree_node_t *left;
   tree_node_t *right;
+  tree_node_t *parent;
+  tree_parent_type_t parent_type;
 };
 
 /**

@@ -5,6 +5,7 @@
 #ifndef EXPR_TYPES_H
 #define EXPR_TYPES_H
 
+#include <stdbool.h>
 #include <stdio.h>
 
 #ifndef EXPR_MAX_VARIABLE_NAME_LEN
