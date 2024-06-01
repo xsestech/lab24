@@ -10,13 +10,11 @@ tree_t tree_init() {
   return NULL;
 }
 
-tree_t tree_malloc_node(token_t token, tree_node_t *left, tree_node_t *right, tree_node_t* parent, tree_parent_type_t parent_type) {
+tree_t tree_malloc_node(token_t token, tree_node_t *left, tree_node_t *right) {
   tree_node_t *node = malloc(sizeof(tree_node_t));
   node->value = token;
   node->left = left;
   node->right = right;
-  node->parent = parent;
-  node->parent_type = parent_type;
   return node;
 }
 
@@ -26,7 +24,7 @@ tree_t tree_build_from_expr(list_handle_t postfix_expr) {
        list_iter_next(iter)) {
     token_t token = list_iter_val(iter);
     if (token.type != TOKEN_OPERATOR) {
-      stack_push(nodes, tree_malloc_node(token, NULL, NULL, NULL, PARENT_NONE));
+      stack_push(nodes, tree_malloc_node(token, NULL, NULL));
     } else {
       tree_node_t *right = stack_pop(nodes);
       tree_node_t *left = NULL;
@@ -36,14 +34,10 @@ tree_t tree_build_from_expr(list_handle_t postfix_expr) {
         token_t zero;
         zero.type = TOKEN_CONST;
         zero.data.const_var = 0;
-        left = tree_malloc_node(zero, NULL, NULL, NULL, PARENT_NONE);
+        left = tree_malloc_node(zero, NULL, NULL);
         token.data.operator = '-';
       }
-      tree_node_t *new_node = tree_malloc_node(token, left, right, NULL, PARENT_NONE);
-      new_node->left->parent = new_node;
-      new_node->left->parent_type = PARENT_LEFT;
-      new_node->right->parent = new_node;
-      new_node->left->parent_type = PARENT_RIGHT;
+      tree_node_t *new_node = tree_malloc_node(token, left, right);
       stack_push(nodes, new_node);
     }
   }
@@ -98,27 +92,11 @@ tree_t dfs(tree_t tree, token_t token) {
   return NULL;
 }
 
-void tree_delete_node(tree_t tree) {
-  if (tree->parent == NULL) {
-    return;
-  }
-  if(tree->parent_type == PARENT_LEFT) {
-    tree->parent->left = NULL;
-  }
-  if (tree->parent_type == PARENT_RIGHT) {
-    tree->parent->right = NULL;
-  }
-  free(tree);
-}
-
 void tree_compare(tree_t tree1, tree_t tree2) {
   while (tree1->value.type != TOKEN_CONST && tree1->value.type != TOKEN_VARIABLE) {
     tree1 = tree1->left;
   }
   tree_t similar_node = dfs(tree2, tree1->value);
-  while (similar_node->parent != NULL) {
-    // if(dfs())
-  }
 
 }
 

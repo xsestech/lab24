@@ -28,8 +28,6 @@ struct tree_node_t {
   token_t value;
   tree_node_t *left;
   tree_node_t *right;
-  tree_node_t *parent;
-  tree_parent_type_t parent_type;
 };
 
 /**
