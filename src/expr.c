@@ -142,13 +142,16 @@ bool shunting_yard(list_handle_t infinx_expr, list_handle_t postfix_expr) {
         list_push_back(stack, token);
         break;
       case TOKEN_RIGHT_BRACKET:
+        if (list_is_empty(stack)) {
+          return false;
+        }
         top_token = list_iter_val(list_end(stack));
         while (top_token.type != TOKEN_LEFT_BRACKET) {
+          list_push_back(postfix_expr, top_token);
+          list_remove(list_end(stack));
           if (list_is_empty(stack)) {
             return false;
           }
-          list_push_back(postfix_expr, top_token);
-          list_remove(list_end(stack));
           top_token = list_iter_val(list_end(stack));
         }
         if (list_iter_val(list_end(stack)).type != TOKEN_LEFT_BRACKET) {
@@ -170,4 +173,20 @@ bool shunting_yard(list_handle_t infinx_expr, list_handle_t postfix_expr) {
   list_destroy(stack);
 
   return true;
+}
+
+void expr_check_error(read_token_result_t error) {
+  switch (error) {
+    case READ_TOKEN_INVALID_CHAR:
+      fprintf(stderr, "Invalid character in variable name");
+      exit(READ_TOKEN_INVALID_CHAR);
+    case READ_EXPR_EMPTY:
+      fprintf(stderr, "You need to type expression");
+      exit(READ_EXPR_EMPTY);
+    case READ_TOKEN_UNEXPECTED_INPUT:
+      fprintf(stderr, "Unacceptable input");
+      exit(READ_TOKEN_UNEXPECTED_INPUT);
+    default:
+      break;
+  }
 }

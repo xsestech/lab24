@@ -19,5 +19,6 @@ read_token_result_t read_token(token_t *out, token_type_t prev);
 read_token_result_t read_expr(list_handle_t list);
 void print_token(token_t token);
 bool shunting_yard(list_handle_t infinx_expr, list_handle_t postfix_expr);
+void expr_check_error(read_token_result_t error);
 
 #endif //EXPR_H

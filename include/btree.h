@@ -53,6 +53,12 @@ token_t tree_get_value(tree_node_t *node);
  * @param tree tree handle
  */
 void tree_print(tree_t tree);
+/**
+ * Gets maxium depth of tree
+ * @param tree tree hanlde
+ * @return Depth
+ */
+int tree_depth(tree_t tree);
 tree_t tree_build_from_expr(list_handle_t postfix_expr);
 
 #endif //BTREE_H

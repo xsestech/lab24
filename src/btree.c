@@ -6,6 +6,16 @@
 
 #include <string.h>
 
+#define swap(a, b, type) \
+  do {                   \
+  type tmp__ = a;        \
+  a = b;                 \
+  b = tmp__;             \
+  } while (0);
+
+#define swap_nodes(a, b) \
+  swap(a, b, tree_t)
+
 tree_t tree_init() {
   return NULL;
 }
@@ -17,6 +27,57 @@ tree_t tree_malloc_node(token_t token, tree_node_t *left, tree_node_t *right) {
   node->right = right;
   return node;
 }
+
+bool tree_op_cmp(tree_t tree, char op) {
+  if (tree == NULL) {
+    return false;
+  }
+  return (tree->value.data.operator == op) && (tree->value.type == TOKEN_OPERATOR);
+}
+
+tree_t tree_deepest_operator(tree_t tree, char operator) {
+  if (!tree_op_cmp(tree, operator)) {
+    return NULL;
+  }
+  stack_handle_t stack = stack_init();
+  stack_push(stack, tree);
+  tree_t deepest_node = tree;
+  int depth = 0;
+  while(!stack_is_empty(stack)) {
+    tree_t node = stack_pop(stack);
+    if (tree_op_cmp(node->right, operator)) {
+      stack_push(stack, node->right);
+      deepest_node = node->right;
+    }
+    if (tree_op_cmp(node->left, operator)) {
+      stack_push(stack, node->left);
+      deepest_node = node->left;
+    }
+    depth++;
+  }
+  if (depth == 1) {
+    return NULL;
+  }
+  stack_destroy(stack);
+  return deepest_node;
+}
+
+// tree_t tree_operator_sort(tree_t tree, char operator) {
+//   if (!tree_op_cmp(tree, operator)) {
+//     return NULL;
+//   }
+//   stack_handle_t stack = stack_init();
+//   stack_push(stack, tree);
+//   while(!stack_is_empty(stack)) {
+//     tree_t node = stack_pop(stack);
+//     if (tree_op_cmp(node->right, operator)) {
+//       stack_push(stack, node->right);
+//     }
+//     if (tree_op_cmp(node->left, operator)) {
+//       stack_push(stack, node->left);
+//     }
+//   }
+// }
 
 tree_t tree_build_from_expr(list_handle_t postfix_expr) {
   stack_handle_t nodes = stack_init();
@@ -37,11 +98,31 @@ tree_t tree_build_from_expr(list_handle_t postfix_expr) {
         left = tree_malloc_node(zero, NULL, NULL);
         token.data.operator = '-';
       }
+      // if ((right->value.type == TOKEN_OPERATOR) && (right->value.data.operator == token.data.operator)) {
+      //   tree_t deepest_op = tree_deepest_operator(left, right->value.data.operator);
+      //   if(deepest_op != NULL) {
+      //     swap_nodes(deepest_op->left, right);
+      //   } else {
+      //     swap_nodes(left, right);
+      //   }
+      // }
+
       tree_node_t *new_node = tree_malloc_node(token, left, right);
       stack_push(nodes, new_node);
     }
   }
   return stack_pop(nodes);
+}
+
+
+
+int tree_depth_recursive(tree_t tree, int depth) {
+  if (tree == NULL) {
+    return depth;
+  }
+  int left_depth = tree_depth_recursive(tree->left, depth + 1);
+  int right_depth = tree_depth_recursive(tree->right, depth + 1);
+  return left_depth > right_depth ? left_depth : right_depth;
 }
 
 void tree_print_recursive(tree_t tree, int h) {
@@ -55,6 +136,10 @@ void tree_print_recursive(tree_t tree, int h) {
   printf("\n");
   tree_print_recursive(tree->left, h + 1);
   tree_print_recursive(tree->right, h + 1);
+}
+
+int tree_depth(tree_t tree) {
+  return tree_depth_recursive(tree, 0);
 }
 
 bool token_cmp(token_t token1, token_t token2) {
@@ -92,13 +177,7 @@ tree_t dfs(tree_t tree, token_t token) {
   return NULL;
 }
 
-void tree_compare(tree_t tree1, tree_t tree2) {
-  while (tree1->value.type != TOKEN_CONST && tree1->value.type != TOKEN_VARIABLE) {
-    tree1 = tree1->left;
-  }
-  tree_t similar_node = dfs(tree2, tree1->value);
 
-}
 
 void tree_print(tree_t tree) {
   tree_print_recursive(tree, 0);
